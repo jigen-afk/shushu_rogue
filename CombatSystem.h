@@ -4,93 +4,85 @@
 #include "Creature.h"
 #include <memory>
 #include <vector>
+#include <iostream>
 
 class CombatDeck;
 class RandomGenerator;
 class EventSystem;
 class Player;
 class Card;
-
+class Monster;
 
 class CombatSystem {
 public:
-    static CombatSystem* getInstance();
-
+    static std::shared_ptr<CombatSystem> getInstance();
     
-    CombatSystem(std::shared_ptr<RandomGenerator> randomGen,
-        std::shared_ptr<EventSystem> eventSystem,
-        std::shared_ptr<Player> player);
-
+    // 初始化战斗
+    void init(std::shared_ptr<Player> player, std::shared_ptr<Monster> monster);
     
-    CombatSystem();
-
-    std::vector<std::shared_ptr<Creature>> Monsters_;
-    std::unique_ptr<CombatDeck> deckManager_;
-    std::shared_ptr<Card> tem_card;
-
-    void init(int type = -1);
-
-    void onAttack(std::shared_ptr<Creature> attacker, std::shared_ptr<Creature> target,
-        int& numeric_value_, std::string cardName = "", bool isForIntentionUpdate = false);
-
-    void combatStart();
-    void combatEnd();
-
-    void takeDamage(std::shared_ptr<Creature> target, int numeric_value_,
-        std::shared_ptr<Creature> attacker = nullptr);
-
-    void Addblock(std::shared_ptr<Creature> target, int numeric_value_);
-    void exhaustCard(int num, std::string cardName = "");
-    void updateBuff(std::shared_ptr<Creature> creature);
-    void exhaustCard();
-    void exhaustCard(std::shared_ptr<Card> card);
+    // 卡牌操作 - 委托给 CombatDeck
+    void drawCards(int count);
+    void discardHand();
+    void addToHand(std::shared_ptr<Card> card);
+    void removeFromHand(std::shared_ptr<Card> card);
+    std::shared_ptr<Card> removeFromHand(int index);
+    void addToDiscardPile(std::shared_ptr<Card> card);
+    void addToExhaustPile(std::shared_ptr<Card> card);
+    void addToDeck(std::shared_ptr<Card> card);
+    bool exhaustCard(std::shared_ptr<Card> card);
+    bool exhaustCard(int index);
+    bool discardCard(std::shared_ptr<Card> card);
+    bool discardCard(int index);
+    
+    // 战斗操作
+    void onAttack(std::shared_ptr<Creature> source, std::shared_ptr<Creature> target, 
+                  int damage, const std::string& cardName = "");
+    void Addblock(std::shared_ptr<Creature> target, int block);
+    void takeDamage(std::shared_ptr<Creature> target, int damage);
+    void addBuff(std::shared_ptr<Buff> buff, int value, std::shared_ptr<Creature> target);
+    void addEnergy(std::shared_ptr<Creature> user, int value);
+    void addHealth(std::shared_ptr<Creature> target, int value);
+    
+    // 回合控制
     void startTurn(std::shared_ptr<Creature> creature);
     void endTurn(std::shared_ptr<Creature> creature);
+    void updateBuff(std::shared_ptr<Creature> creature);
+    
+    // 卡牌打出
     void cardPlayed(std::shared_ptr<Card> card);
-    void endTurnCardPlayed();
-    void cardPlayed(std::shared_ptr<Card> card, std::shared_ptr<Creature> creature);
-    void discardCard(std::shared_ptr<Card> card);
+    void cardPlayed(std::shared_ptr<Card> card, std::shared_ptr<Creature> target);
     void upgradeCard(std::shared_ptr<Card> card);
-    void addEnergy(std::shared_ptr<Creature> user, int numeric_value_);
-    void addBuff(std::shared_ptr<Buff> buff, int numeric_value, std::shared_ptr<Creature> target);
-    void addHealth(std::shared_ptr<Creature> target, int numeric_value);
-    void shuffleDeck();
-    void drawCard(int num);
-
-    int getDrawPileNumber();
-    int getHandNumber();
-    int getDiscardPileNumber();
-
-    void addToHand(std::shared_ptr<Card> card, int num = 1);
-    void addToDrawPile(std::shared_ptr<Card> card, int num = 1);
-    void addToDiscardPile(std::shared_ptr<Card> card, int num = 1);
+    
+    // 战斗流程
+    void combatStart();
+    void combatEnd();
     void onDeath(std::shared_ptr<Creature> creature);
-
-    int getRoundNumber() const
-    {
-        return round_;
-    }
-
-    void tem_cardPlayed(std::shared_ptr<Card> card);
-    std::shared_ptr<Creature> getMonsterPointer(Creature* creature);
-    void use_tem_card();
-
-    // Get CombatDeck instance (for backward compatibility)
-    CombatDeck* getDeckManager() const { return deckManager_.get(); }
-
-   
-
-    ~CombatSystem() { };
-
+    
+    // 洗牌
+    void shuffleDeck();
+    
+    // 获取信息
+    std::vector<std::shared_ptr<Card>> getHand() const;
+    std::shared_ptr<Card> getHandCard(int index) const;
+    int getHandSize() const;
+    int getDeckSize() const;
+    int getDiscardPileNumber() const;
+    int getDrawPileNumber() const;
+    std::shared_ptr<Monster> getMonster() const { return monster_; }
+    std::shared_ptr<Player> getPlayer() const { return player_; }
+    
+    // 获取CombatDeck实例（用于初始化）
+    std::shared_ptr<CombatDeck> getCombatDeck() const { return combatDeck_; }
+    
+    // 兼容性：访问牌堆（仅用于显示）
+    std::vector<std::shared_ptr<Card>> deck;  // 主牌组（战斗外）
+    
 private:
-    static CombatSystem* instance_;
-
-    // NEW: Injected dependencies
-    std::shared_ptr<RandomGenerator> randomGen_;
-    std::shared_ptr<EventSystem> eventSystem_;
+    CombatSystem();
+    static std::shared_ptr<CombatSystem> instance_;
+    
     std::shared_ptr<Player> player_;
-
-
-    int round_;
-    int isLastCombat = 0;
+    std::shared_ptr<Monster> monster_;
+    std::shared_ptr<RandomGenerator> randomGen_;
+    std::shared_ptr<CombatDeck> combatDeck_;  // 战斗牌组管理器
 };

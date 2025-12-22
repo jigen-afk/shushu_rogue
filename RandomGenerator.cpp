@@ -1,4 +1,8 @@
 #include "RandomGenerator.h"
+#include "Register.h"
+#include "Card.h"
+#include "Monster.h"
+#include "Relic.h"
 
 using namespace std;
 
@@ -7,15 +11,7 @@ using namespace std;
 //1.战斗：用于战斗中的随机数，比如洗牌
 //2.其余：用于生成其他资源
 
-/*
-* 需要功能：
-* 1.返回一张随机卡牌->1
-* 2.返回一个随机药水->3
-* 3.返回一个怪物->3
-* 4.返回一个随机遗物->3
-* 5.返回一个可以指定上下限的数字->3
-* 6.给一个数组，返回一个元素被打乱顺序的数组->2
-*/
+
 RandomGenerator* RandomGenerator::getInstance()
 {
 	static RandomGenerator instance;

@@ -53,7 +53,7 @@ public:
     Thorns() : Buff("Thorns", "", 0, 0, true, 0, YES, DURATION) {}
     void onAttacked(int& numeric_value_, std::shared_ptr<Creature> user, std::shared_ptr<Creature> target)
     {
-        CombatSystem::getInstance()->takeDamage(user, 5, target);
+        CombatSystem::getInstance()->takeDamage(user, 5);
     }
 };
 AUTO_REGISTER_BUFF(Thorns);

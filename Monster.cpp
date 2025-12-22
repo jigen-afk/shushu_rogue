@@ -1,214 +1,210 @@
 #include "Monster.h"
 #include "Enum.h"
-#include "string"
-#include "random"
+#include <string>
+#include <random>
 #include "Player.h"
 #include "CombatSystem.h"
 #include "Register.h"
 
 using namespace std;
 
-
-
+// 早八 - 第一关怪物
 class Zaoba : public Monster
 {
 public:
-    Zaoba() : Monster(NORMAL, 20, "早八", 2) {
-    }
-    void takeEffect() {
-        
-        shared_ptr<Creature> thisMonster = CombatSystem::getInstance()->getMonsterPointer(this);
-       
-        
-        random_device rd;               // 用于生成随机种子
-        mt19937 gen(rd());              // 随机数引擎
-        uniform_real_distribution<> dist(0.0, 1.0); // [0.0, 1.0) 均匀分布
-        double randomValue = dist(gen); // 生成随机数
-
-        if (tag == 0) {
-
-            int basic_attack_value = 9;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                basic_attack_value, "");
-            if (randomValue < 0.6) {
-                tag = 1; // 60% 的概率赋值为 1
-            }
-            else {
-                tag = 2; // 40% 的概率赋值为 2
-            }
-        }
-        else if (tag == 1) {
-            CombatSystem::getInstance()->addBuff(BuffRegistry::createBuff("StrengthBuff"), 3, thisMonster);
-            if (randomValue < 0.45) {
-                tag = 0; // 45% 的概率赋值为 0
-            }
-            else {
-                tag = 2; // 55% 的概率赋值为 2
-            }
-        }
-        else{
-            int basic_attack_value = 7;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                basic_attack_value, "");
-            CombatSystem::getInstance()->Addblock(thisMonster,5 );
-            if (randomValue < 0.36) {
-                tag = 0; // 36% 的概率赋值为 0
-            }
-            else {
-                tag = 1; // 64% 的概率赋值为 1
-            }
-        }
-    }
-    string intentionDisplay() {
-        shared_ptr<Creature> thisMonster = CombatSystem::getInstance()->getMonsterPointer(this);
-        if (tag == 0) {
-            attack_numeric_value = 9;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                attack_numeric_value, "", true);
-            attack_times = 1;
-            //return "attack.png";
-        }
-        else if (tag == 1) {
-            //return "defendBuff.png";
-        }
-        else {
-            //return "attackDefend.png";
-        }
-    }
-};
-
-AUTO_REGISTER_MONSTER(Zaoba)
-
-/*
-class Sentinel : public Monster
-{
-public:
-    //赋予两层人工制品
-    Sentinel() : Monster(ELITE, 40, "Sentinel", 3) {
-        std::shared_ptr<Buff> buff = BuffRegistry::createBuff("ArtificialProducts");
-        buff->effect_layers = 3;
-        buffs_.push_back(buff);
+    Zaoba() : Monster(NORMAL, 25, "早八", 1) {
+        description_ = "每天早上8点的课程，让人痛不欲生";
+        attack_times = 1;
+        attack_numeric_value = 6;
     }
     
-    void takeEffect() {
-        if (tag == 0) {
-            std::shared_ptr<Creature> thisMonster = CombatSystem::getInstance()->getMonsterPointer(this);
-            int basic_attack_value = 9;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                basic_attack_value, "");
-            tag = 1;
-            
-        }
-        else if (tag == 1) {
-            //玩家手中塞牌
-            CombatSystem::getInstance()->addToDiscardPile(CardRegistry::createCard("dazed"), 2);
-            tag = 0;
+    void takeEffect() override {
+        auto player = Player::getInstance();
+        if (round_num % 2 == 1) {
+            // 攻击
+            cout << name_ << " 发动了【点名攻击】！\n";
+            CombatSystem::getInstance()->onAttack(
+                shared_ptr<Monster>(this, [](Monster*){}), 
+                player, attack_numeric_value, "点名");
+        } else {
+            // 防御
+            cout << name_ << " 进入【划水状态】，获得5点格挡\n";
+            addBlock(5);
         }
     }
-
-    std::string intentionDisplay() {
-        std::shared_ptr<Creature> thisMonster = CombatSystem::getInstance()->getMonsterPointer(this);
-        if (tag == 0) {
-            attack_numeric_value = 9;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                attack_numeric_value, "", true);
+    
+    string intentionDisplay() override {
+        if (round_num % 2 == 0) {
             attack_times = 1;
-            //return "attack.png";
-        }
-        else {
-            //return "debuff1.png";
+            attack_numeric_value = 6;
+            return "攻击 " + to_string(attack_numeric_value);
+        } else {
+            attack_times = 0;
+            return "防御";
         }
     }
 };
+AUTO_REGISTER_MONSTER(Zaoba)
 
-AUTO_REGISTER_MONSTER(Sentinel)
-*/
+// 高数作业 - 第二关怪物
+class MathHomework : public Monster
+{
+public:
+    MathHomework() : Monster(NORMAL, 35, "高数作业", 1) {
+        description_ = "密密麻麻的公式，看得人头皮发麻";
+        attack_times = 1;
+        attack_numeric_value = 8;
+    }
+    
+    void takeEffect() override {
+        auto player = Player::getInstance();
+        cout << name_ << " 发动了【公式轰炸】！\n";
+        CombatSystem::getInstance()->onAttack(
+            shared_ptr<Monster>(this, [](Monster*){}), 
+            player, attack_numeric_value, "公式轰炸");
+        
+        // 每3回合加强
+        if (round_num % 3 == 0) {
+            attack_numeric_value += 2;
+            cout << name_ << " 的难度增加了！攻击力+" << 2 << "\n";
+        }
+    }
+    
+    string intentionDisplay() override {
+        attack_times = 1;
+        return "攻击 " + to_string(attack_numeric_value);
+    }
+};
+AUTO_REGISTER_MONSTER(MathHomework)
 
+// 体测 - 第三关怪物
+class PhysicalTest : public Monster
+{
+public:
+    PhysicalTest() : Monster(NORMAL, 45, "体测800米", 1) {
+        description_ = "跑完感觉灵魂都要出窍了";
+        attack_times = 2;
+        attack_numeric_value = 5;
+    }
+    
+    void takeEffect() override {
+        auto player = Player::getInstance();
+        cout << name_ << " 发动了【连续冲刺】！攻击2次！\n";
+        for (int i = 0; i < attack_times; i++) {
+            CombatSystem::getInstance()->onAttack(
+                shared_ptr<Monster>(this, [](Monster*){}), 
+                player, attack_numeric_value, "冲刺");
+        }
+    }
+    
+    string intentionDisplay() override {
+        attack_times = 2;
+        attack_numeric_value = 5;
+        return "攻击 " + to_string(attack_numeric_value) + " x" + to_string(attack_times);
+    }
+};
+AUTO_REGISTER_MONSTER(PhysicalTest)
 
+// DDL - 第四关怪物
+class DDL : public Monster
+{
+public:
+    DDL() : Monster(ELITE, 55, "DDL压力", 1) {
+        description_ = "Deadline是第一生产力，也是第一杀手";
+        attack_times = 1;
+        attack_numeric_value = 12;
+    }
+    
+    void takeEffect() override {
+        auto player = Player::getInstance();
+        if (round_num <= 2) {
+            cout << name_ << " 进入【倒计时】状态，获得8点格挡\n";
+            addBlock(8);
+            attack_numeric_value += 3;
+            cout << "攻击力增加到 " << attack_numeric_value << "！\n";
+        } else {
+            cout << name_ << " 发动了【最后通牒】！\n";
+            CombatSystem::getInstance()->onAttack(
+                shared_ptr<Monster>(this, [](Monster*){}), 
+                player, attack_numeric_value, "最后通牒");
+        }
+    }
+    
+    string intentionDisplay() override {
+        if (round_num <= 2) {
+            attack_times = 0;
+            return "蓄力 (攻击力+3)";
+        } else {
+            attack_times = 1;
+            return "攻击 " + to_string(attack_numeric_value);
+        }
+    }
+};
+AUTO_REGISTER_MONSTER(DDL)
+
+// 期末考试 - Boss
 class Exam : public Monster
 {
 public:
-    Exam() : Monster(BOSS, 250, "考试", 1) {}
-    void takeEffect() {
-        std::shared_ptr<Creature> thisMonster = CombatSystem::getInstance()->getMonsterPointer(this);
-        if (tag == 0) {
-            int basic_attack_value = 6;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                basic_attack_value, "");
-            //塞入一张虚无
-            CombatSystem::getInstance()->addToDiscardPile(CardRegistry::createCard("dazed"), 1);
-            round_num++;
-        }
-        else if (tag == 1) {
-            int basic_attack_value = 6;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                basic_attack_value, "");
-            round_num++;
-        }
-        else if (tag == 2) {
-            CombatSystem::getInstance()->Addblock(thisMonster, 12);
-            //获得力量Buff
-            CombatSystem::getInstance()->addBuff(BuffRegistry::createBuff("StrengthBuff"), 2, thisMonster);
-            round_num++;
-        }
-        else if (tag == 3) {
-            for (int i = 0; i < 6; i++) {
-                int basic_attack_value = Player::getInstance()->getHealth() / 12 + 1;
-                CombatSystem::getInstance()->onAttack(std::make_shared<Exam>(), Player::getInstance(),
-                    basic_attack_value, "");
-            }
-            //塞入三张虚无
-            CombatSystem::getInstance()->addToDiscardPile(CardRegistry::createCard("dazed"), 3);
-            round_num++;
-        }
-        if (round_num % 7 == 1 || round_num % 7 == 3 || round_num % 7 == 6) {
-            tag = 0;
-        }
-        else if (round_num % 7 == 2 || round_num % 7 == 5) {
-            tag = 1;
-        }
-        else if (round_num % 7 == 4) {
-            tag = 2;
-        }
-        else if (round_num % 7 == 0) {
-            tag = 3;
+    Exam() : Monster(BOSS, 100, "期末考试周", 1) {
+        description_ = "所有科目同时袭来，这是最终的试炼！";
+        attack_times = 1;
+        attack_numeric_value = 10;
+    }
+    
+    void takeEffect() override {
+        auto player = Player::getInstance();
+        int action = round_num % 4;
+        
+        switch(action) {
+            case 1:
+                cout << name_ << " 发动了【突击检查】！\n";
+                CombatSystem::getInstance()->onAttack(
+                    shared_ptr<Monster>(this, [](Monster*){}), 
+                    player, attack_numeric_value, "突击检查");
+                break;
+            case 2:
+                cout << name_ << " 进入【复习周】，获得12点格挡并恢复5点生命\n";
+                addBlock(12);
+                addHealth(5);
+                break;
+            case 3:
+                cout << name_ << " 发动了【连环考试】！攻击3次！\n";
+                for (int i = 0; i < 3; i++) {
+                    CombatSystem::getInstance()->onAttack(
+                        shared_ptr<Monster>(this, [](Monster*){}), 
+                        player, 6, "考试");
+                }
+                break;
+            case 0:
+                cout << name_ << " 发动了【挂科警告】！造成巨额伤害！\n";
+                CombatSystem::getInstance()->onAttack(
+                    shared_ptr<Monster>(this, [](Monster*){}), 
+                    player, 20, "挂科警告");
+                break;
         }
     }
-    string intentionDisplay() 
-    {
-        shared_ptr<Creature> thisMonster = CombatSystem::getInstance()->getMonsterPointer(this);
-        // 在修改意图的时候计算造成的伤害数值和段数
-        if (tag == 0) 
-        {
-            attack_numeric_value = 6;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                attack_numeric_value, "", true);
-            attack_times = 1;
-            //return "attack.png";
-        }
-        else if(tag == 1) 
-        {
-            attack_numeric_value = 6;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                attack_numeric_value, "", true);
-            attack_times = 2;
-            //return "attack.png";
-        }
-        else if (tag == 2) 
-        {
-            //return "defendBuff.png";
-        }
-        else if (tag == 3) 
-        {
-            attack_numeric_value = Player::getInstance()->getHealth() / 12 + 1;
-            CombatSystem::getInstance()->onAttack(thisMonster, Player::getInstance(),
-                attack_numeric_value, "", true);
-            attack_times = 6;
-            //return "attack.png";
-        }
-        else
-        {
-            return "";
+    
+    string intentionDisplay() override {
+        int action = (round_num + 1) % 4;
+        switch(action) {
+            case 1:
+                attack_times = 1;
+                attack_numeric_value = 10;
+                return "攻击 " + to_string(attack_numeric_value);
+            case 2:
+                attack_times = 0;
+                return "防御并恢复";
+            case 3:
+                attack_times = 3;
+                attack_numeric_value = 6;
+                return "攻击 6 x3";
+            case 0:
+                attack_times = 1;
+                attack_numeric_value = 20;
+                return "强力攻击 20";
+            default:
+                return "未知";
         }
     }
 };

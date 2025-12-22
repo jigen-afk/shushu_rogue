@@ -27,8 +27,7 @@ enum Rarity
 {
     COMMON,
     UNCOMMON,
-    RARE,
-    ALL
+    RARE
 };
 enum CardType
 {
@@ -66,13 +65,7 @@ enum CardType
         return true;                                           \
     }();
 
-/*#define AUTO_REGISTER_POTION(className)                        \
-    const bool className##Registered = []() {                  \
-        PotionRegistry::registerPotion(#className, []() {      \
-           return std::make_shared<className>();               \
-        });                                                    \
-        return true;                                           \
-    }();*/
+
 
 #define AUTO_REGISTER_MONSTER(className)                       \
     const bool className##Registered = []() {                  \

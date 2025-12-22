@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "Effect.h"
 #include "CombatSystem.h"
 #include "Register.h"
@@ -13,9 +13,9 @@ public:
           upgradeDamageDelta_(upgradeDamageDelta),
           upgradeVulnerabilityDelta_(upgradeVulnerabilityDelta) {}
 
-    void execute(std::shared_ptr<Creature> source = nullptr,
-                std::shared_ptr<Creature> target = nullptr,
-                std::shared_ptr<Card> card = nullptr,
+    void execute(std::shared_ptr<Creature> source,
+                std::shared_ptr<Creature> target,
+                std::shared_ptr<Card> card,
                 int& numeric_value) override {
         if (!target) {
             return;
@@ -38,3 +38,4 @@ private:
     int upgradeDamageDelta_;
     int upgradeVulnerabilityDelta_;
 };
+*/

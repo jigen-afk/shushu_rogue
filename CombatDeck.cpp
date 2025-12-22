@@ -1,6 +1,6 @@
 #include "CombatDeck.h"
 #include "Card.h"
-#include "CardRegistry.h"
+#include "Register.h"
 #include "RandomGenerator.h"
 #include "Player.h"
 
@@ -51,7 +51,7 @@ bool CombatDeck::init(std::shared_ptr<Player> player)
                 auto card = CardRegistry::createCard(name);
                 if (card) {
                     addToDrawPile(card);
-                    CCLOG("%s has been added!", name.c_str());
+                    //CCLOG("%s has been added!", name.c_str());
                     std::cout << "[CombatDeck] Added card to draw pile: " << name << std::endl;
                 }
             }
