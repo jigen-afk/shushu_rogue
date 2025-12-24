@@ -500,7 +500,7 @@ public:
             cout << "\n请选择路径 (输入编号): ";
             int nodeChoice;
             cin >> nodeChoice;
-            --nodeChoice;
+            nodeChoice;
             
             if (cin.fail()) {
                 cin.clear();
@@ -516,7 +516,7 @@ public:
             }
             
             // 选择并处理节点
-            mapSystem->selectNode(nodeChoice);
+            mapSystem->selectNode(--nodeChoice);
             MapNode* selectedNode = mapSystem->getSelectedNode();
             
             processNode(selectedNode);
