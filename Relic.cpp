@@ -41,14 +41,11 @@ class RewardEverytime : public Relic {
 public:
     RewardEverytime()
         : Relic("RewardEverytime",
-            "大学生要学会奖励自己,战斗结束后加9块钱吃一顿拼好饭",
+            "芋儿鸡芋儿鸡我们喜欢你(≧∇≦)ﾉ，永久增加1点能量",
             1) {}
 
-    void onAddCard(std::shared_ptr<Card> card) override {
-        if (card) {
-            int goldGain = 9;
-            EventSystem::getInstance()->changeCoins(goldGain);
-        }
+    void onGetEnergy(int numeric_value_) override {
+        Player::getInstance()->maxEnergyChange(numeric_value_);
     }
 };
 AUTO_REGISTER_RELIC(RewardEverytime);

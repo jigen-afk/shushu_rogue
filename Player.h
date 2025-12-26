@@ -19,6 +19,7 @@ public:
     int getMaxEnergy() const { return maxEnergy_; }
     int getCurrentEnergy() const { return currentEnergy_; }
     void energyChange(int changeValue);
+    void maxEnergyChange(int changeValue) { maxEnergy_ += changeValue; }
     void setMaxEnergy(int value) { maxEnergy_ = value; }
 
     void init();

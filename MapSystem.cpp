@@ -1,5 +1,7 @@
 #include "MapSystem.h"
 #include "RandomGenerator.h"
+#include "Monster.h"
+#include "Enum.h"
 #include <iostream>
 #include <algorithm>
 
@@ -39,17 +41,23 @@ void MapSystem::generateLayerNodes(int layer) {
     
     if (layer == TOTAL_LAYERS - 1) {
         // 最后一层是Boss
-        nodes.push_back(MapNode(NODE_BOSS, "期末考试周"));
+        auto boss = rng->getRandomMonster(BOSS);
+        nodes.push_back(MapNode(NODE_BOSS, boss ? boss->getName() : "期末考试周"));
     } else if (layer == 0) {
         // 第一层
-        nodes.push_back(MapNode(NODE_MONSTER, "早八课程"));
-        nodes.push_back(MapNode(NODE_MONSTER, "高数作业"));
-        nodes.push_back(MapNode(NODE_EVENT, "校园偶遇"));
+        nodes.push_back(MapNode(NODE_MONSTER, "日常困难"));
+        nodes.push_back(MapNode(NODE_MONSTER, "日常困难"));
+        
+        //vector<string> eventNames = {"修路施工", "图书馆占座", "室友请求", "SRM招新", "食堂阿姨", "快递到了", "传单推销", "南12不眠之夜", "学霸请教", "奖学金公示"};
+        //nodes.push_back(MapNode(NODE_EVENT, eventNames[rng->getRandomNumber(0, eventNames.size() - 1)]));
+        nodes.push_back(MapNode(NODE_EVENT, "随机事件"));
     } else if (layer == TOTAL_LAYERS - 2) {
         // Boss前一层
         nodes.push_back(MapNode(NODE_REST, "寝室休息"));
         nodes.push_back(MapNode(NODE_SHOP, "校园超市"));
-        nodes.push_back(MapNode(NODE_ELITE, "期中考试"));
+        
+        auto elite = rng->getRandomMonster(ELITE);
+        nodes.push_back(MapNode(NODE_ELITE, elite ? elite->getName() : "DDL压力"));
     } else {
         // 中间层随机生成2-3个节点
         int nodeCount = rng->getRandomNumber(2, 3);
@@ -63,10 +71,7 @@ void MapSystem::generateLayerNodes(int layer) {
             {NODE_ELITE, 5}
         };
         
-        // 节点名称池
-        vector<string> monsterNames = {"早八课程", "高数作业", "英语听力", "体测800米", "实验报告"};
-        vector<string> eventNames = {"食堂偶遇", "快递驿站", "社团活动", "图书馆", "校园小路"};
-        vector<string> eliteNames = {"小测验", "课堂展示", "实验答辩"};
+        //vector<string> eventNames = {"修路施工", "图书馆占座", "室友请求", "SRM招新", "食堂阿姨", "快递到了", "传单推销", "南12不眠之夜", "学霸请教", "奖学金公示"};
         
         for (int i = 0; i < nodeCount; i++) {
             int roll = rng->getRandomNumber(1, 100);
@@ -83,15 +88,22 @@ void MapSystem::generateLayerNodes(int layer) {
             
             string nodeName;
             switch (selectedType) {
-                case NODE_MONSTER:
-                    nodeName = monsterNames[rng->getRandomNumber(0, monsterNames.size() - 1)];
+                case NODE_MONSTER: {
+                    auto m = rng->getRandomMonster(NORMAL);
+                    //nodeName = m ? m->getName() : "普通困难";
+                    nodeName = "日常困难";
                     break;
+                }
                 case NODE_EVENT:
-                    nodeName = eventNames[rng->getRandomNumber(0, eventNames.size() - 1)];
+                    //nodeName = eventNames[rng->getRandomNumber(0, eventNames.size() - 1)];
+                    nodeName = "随机事件";
                     break;
-                case NODE_ELITE:
-                    nodeName = eliteNames[rng->getRandomNumber(0, eliteNames.size() - 1)];
+                case NODE_ELITE: {
+                    auto m = rng->getRandomMonster(ELITE);
+                    //nodeName = m ? m->getName() : "中等困难";
+                    nodeName = "中等困难";
                     break;
+                }
                 case NODE_SHOP:
                     nodeName = "校园超市";
                     break;

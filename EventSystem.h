@@ -17,7 +17,7 @@ public:
     int coins_;
     
 private:
-    EventSystem() : health_(80), fullHealth_(80), coins_(100) {}
+    EventSystem() : health_(80), fullHealth_(80), coins_(100) {} //全局变量
     static std::shared_ptr<EventSystem> instance_;
 };
 

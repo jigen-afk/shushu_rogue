@@ -42,7 +42,7 @@ public:
 
     virtual void onTakeDamage(int& numeric_value_) {};
 
-    virtual void onGetEnergy(int& numeric_value_) {};
+    virtual void onGetEnergy(int numeric_value_) {};
 
     virtual void onLoseBlock(int& numeric_value_) {};
 

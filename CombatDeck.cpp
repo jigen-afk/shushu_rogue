@@ -24,11 +24,11 @@ CombatDeck::~CombatDeck()
 bool CombatDeck::init(std::shared_ptr<Player> player)
 {
     if (!player) {
-        std::cout << "[CombatDeck] Error: Player instance is null during deck initialization" << std::endl;
+        //std::cout << "[CombatDeck] Error: Player instance is null during deck initialization" << std::endl;
         return false;
     }
 
-    std::cout << "[CombatDeck] Initializing deck for player: " << player->getName() << std::endl;
+    //std::cout << "[CombatDeck] Initializing deck for player: " << player->getName() << std::endl;
 
     try {
         // Clear existing cards
@@ -42,7 +42,7 @@ bool CombatDeck::init(std::shared_ptr<Player> player)
         // In a real scenario, this should come from Player's inventory
         std::vector<std::string> tempDeck = CardRegistry::getAllCardNames();
         if (tempDeck.empty()) {
-            std::cout << "[CombatDeck] Warning: No cards found in CardRegistry for initialization" << std::endl;
+            //std::cout << "[CombatDeck] Warning: No cards found in CardRegistry for initialization" << std::endl;
         }
 
         // Add 4 copies of each card for testing (matching original logic)
@@ -50,29 +50,29 @@ bool CombatDeck::init(std::shared_ptr<Player> player)
             for (auto name : tempDeck) {
                 auto card = CardRegistry::createCard(name);
                 if (card) {
-                    addToDrawPile(card);
-                    //CCLOG("%s has been added!", name.c_str());
-                    std::cout << "[CombatDeck] Added card to draw pile: " << name << std::endl;
+                    // Add to discard pile first so shuffle() will move them to draw pile and shuffle
+                    addToDiscardPile(card);
+                    //std::cout << "[CombatDeck] Added card to discard pile for init: " << name << std::endl;
                 }
             }
         }
 
         //std::cout << "[CombatDeck] Initialized successfully - Draw pile: " << drawPile_.size() << ", Discard pile: " << discardPile_.size() << std::endl;
 
-        // Shuffle the deck initially
+        // Shuffle the deck initially (moves discard -> draw and shuffles)
         shuffle();
 
         return true;
 
     } catch (const std::exception& e) {
-        std::cerr << "[CombatDeck] Exception during initialization: " << e.what() << std::endl;
+        //std::cerr << "[CombatDeck] Exception during initialization: " << e.what() << std::endl;
         return false;
     }
 }
 
 int CombatDeck::drawCards(int count)
 {
-    std::cout << "[CombatDeck] Drawing " << count << " cards" << std::endl;
+    //std::cout << "[CombatDeck] Drawing " << count << " cards" << std::endl;
 
     int drawnCount = 0;
 
@@ -84,7 +84,7 @@ int CombatDeck::drawCards(int count)
                 //std::cout << "[CombatDeck] Draw pile empty, shuffling discard pile" << std::endl;
                 shuffle();
             } else {
-                std::cout << "[CombatDeck] No cards to draw" << std::endl;
+                //std::cout << "[CombatDeck] No cards to draw" << std::endl;
                 break;
             }
         }
@@ -99,7 +99,7 @@ int CombatDeck::drawCards(int count)
                 drawnCount++;
             } else {
                 // 添加到手牌失败，放回抽牌堆
-                std::cout << "[CombatDeck] Warning: Failed to add card to hand" << std::endl;
+                //std::cout << "[CombatDeck] Warning: Failed to add card to hand" << std::endl;
                 drawPile_.push(card);
                 break;
             }
@@ -108,14 +108,14 @@ int CombatDeck::drawCards(int count)
         }
     }
 
-    std::cout << "[CombatDeck] Drew " << drawnCount << " cards (hand size: " << hand_.size() << ")" << std::endl;
+    //std::cout << "[CombatDeck] Drew " << drawnCount << " cards (hand size: " << hand_.size() << ")" << std::endl;
     return drawnCount;
 }
 
 void CombatDeck::addToDrawPile(std::shared_ptr<Card> card, int count)
 {
     if (!card) {
-        std::cout << "[CombatDeck] Warning: Attempting to add null card to draw pile" << std::endl;
+        //std::cout << "[CombatDeck] Warning: Attempting to add null card to draw pile" << std::endl;
         return;
     }
 
@@ -123,14 +123,14 @@ void CombatDeck::addToDrawPile(std::shared_ptr<Card> card, int count)
         drawPile_.push(card);
     }
 
-    std::cout << "[CombatDeck] Added " << count << " copies of " << card->getName() << " to draw pile (total draw pile: " << drawPile_.size() << ")" << std::endl;
+    //std::cout << "[CombatDeck] Added " << count << " copies of " << card->getName() << " to draw pile (total draw pile: " << drawPile_.size() << ")" << std::endl;
 
-    notifyCardChanged("ADDED_TO_DRAW_PILE", card);
+    //notifyCardChanged("ADDED_TO_DRAW_PILE", card);
 }
 
 void CombatDeck::shuffle()
 {
-    std::cout << "[CombatDeck] Shuffling discard pile into draw pile" << std::endl;
+    //std::cout << "[CombatDeck] Shuffling discard pile into draw pile" << std::endl;
 
     // 将弃牌堆转移到临时向量
     std::vector<std::shared_ptr<Card>> tempCards;
@@ -149,9 +149,9 @@ void CombatDeck::shuffle()
         drawPile_.push(card);
     }
 
-    std::cout << "[CombatDeck] Shuffle complete (draw pile: " << drawPile_.size() << ", discard pile: " << discardPile_.size() << ")" << std::endl;
+    //std::cout << "[CombatDeck] Shuffle complete (draw pile: " << drawPile_.size() << ", discard pile: " << discardPile_.size() << ")" << std::endl;
 
-    notifyCardChanged(CardEvent::SHUFFLED, nullptr);
+    //notifyCardChanged(CardEvent::SHUFFLED, nullptr);
 }
 
 bool CombatDeck::addToHand(std::shared_ptr<Card> card)
@@ -162,9 +162,9 @@ bool CombatDeck::addToHand(std::shared_ptr<Card> card)
     }
 
     hand_.push_back(card);
-    std::cout << "[CombatDeck] Added " << card->getName() << " to hand (hand size: " << hand_.size() << ")" << std::endl;
+    //std::cout << "[CombatDeck] Added " << card->getName() << " to hand (hand size: " << hand_.size() << ")" << std::endl;
 
-    notifyCardChanged(CardEvent::ADDED_TO_HAND, card);
+    //notifyCardChanged(CardEvent::ADDED_TO_HAND, card);
     return true;
 }
 
@@ -177,7 +177,7 @@ bool CombatDeck::removeFromHand(std::shared_ptr<Card> card)
     bool removed = removeCardFromVector(hand_, card);
     if (removed) {
         std::cout << "[CombatDeck] Removed " << card->getName() << " from hand (hand size: " << hand_.size() << ")" << std::endl;
-        notifyCardChanged(CardEvent::REMOVED_FROM_HAND, card);
+       // notifyCardChanged(CardEvent::REMOVED_FROM_HAND, card);
     }
 
     return removed;
@@ -193,28 +193,24 @@ std::shared_ptr<Card> CombatDeck::removeFromHand(int index)
     auto card = hand_[index];
     hand_.erase(hand_.begin() + index);
 
-    std::cout << "[CombatDeck] Removed " << card->getName() << " from hand at index " << index << std::endl;
-    notifyCardChanged(CardEvent::REMOVED_FROM_HAND, card);
+    //std::cout << "[CombatDeck] Removed " << card->getName() << " from hand at index " << index << std::endl;
+    //notifyCardChanged(CardEvent::REMOVED_FROM_HAND, card);
 
     return card;
 }
 
 void CombatDeck::clearHand()
 {
-    std::cout << "[CombatDeck] Clearing all hand cards (count: " << hand_.size() << ")" << std::endl;
+    //std::cout << "[CombatDeck] Clearing all hand cards (count: " << hand_.size() << ")" << std::endl;
 
     for (const auto& card : hand_) {
-        notifyCardChanged(CardEvent::REMOVED_FROM_HAND, card);
+       // notifyCardChanged(CardEvent::REMOVED_FROM_HAND, card);
     }
 
     hand_.clear();
 }
 
-void CombatDeck::adjustHandLayout()
-{
-    // 这个方法通常由UI控制器调用，这里只是占位符
-    std::cout << "[CombatDeck] Adjusting hand layout" << std::endl;
-}
+
 
 void CombatDeck::addToDiscardPile(std::shared_ptr<Card> card, int count)
 {
@@ -227,9 +223,9 @@ void CombatDeck::addToDiscardPile(std::shared_ptr<Card> card, int count)
         discardPile_.push(card);
     }
 
-    std::cout << "[CombatDeck] Added " << count << " copies of " << card->getName() << " to discard pile (total: " << discardPile_.size() << ")" << std::endl;
+   // std::cout << "[CombatDeck] Added " << count << " copies of " << card->getName() << " to discard pile (total: " << discardPile_.size() << ")" << std::endl;
 
-    notifyCardChanged("ADDED_TO_DISCARD_PILE", card);
+    //notifyCardChanged("ADDED_TO_DISCARD_PILE", card);
 }
 
 bool CombatDeck::discardCard(std::shared_ptr<Card> card)
@@ -270,7 +266,7 @@ bool CombatDeck::exhaustCard(std::shared_ptr<Card> card)
     // 从手牌移除但不加入弃牌堆
     if (removeFromHand(card)) {
         std::cout << "[CombatDeck] Exhausted " << card->getName() << std::endl;
-        notifyCardChanged(CardEvent::EXHAUSTED, card);
+        //notifyCardChanged(CardEvent::EXHAUSTED, card);
         return true;
     }
 
@@ -282,7 +278,7 @@ bool CombatDeck::exhaustCard(int index)
     auto card = removeFromHand(index);
     if (card) {
         std::cout << "[CombatDeck] Exhausted card at index " << index << std::endl;
-        notifyCardChanged(CardEvent::EXHAUSTED, card);
+        //notifyCardChanged(CardEvent::EXHAUSTED, card);
         return true;
     }
     return false;
@@ -300,9 +296,9 @@ bool CombatDeck::upgradeCard(std::shared_ptr<Card> card)
             if (!card->isUpgraded()) {
                 card->upgrade();
                 std::cout << "[CombatDeck] Upgraded " << card->getName() << std::endl;
-                notifyCardChanged(CardEvent::UPGRADED, card);
+                //notifyCardChanged(CardEvent::UPGRADED, card);
             } else {
-                std::cout << "[CombatDeck] Card " << card->getName() << " is already upgraded" << std::endl;
+                //std::cout << "[CombatDeck] Card " << card->getName() << " is already upgraded" << std::endl;
             }
             return true;
         }
@@ -357,7 +353,7 @@ int CombatDeck::getTotalCardCount() const
     return drawPile_.size() + hand_.size() + discardPile_.size();
 }
 
-void CombatDeck::notifyCardChanged(const std::string& event, std::shared_ptr<Card> card)
+/*void CombatDeck::notifyCardChanged(const std::string& event, std::shared_ptr<Card> card)
 {
     if (cardChangedCallback_) {
         try {
@@ -366,7 +362,7 @@ void CombatDeck::notifyCardChanged(const std::string& event, std::shared_ptr<Car
             std::cerr << "[CombatDeck] Exception in card changed callback: " << e.what() << std::endl;
         }
     }
-}
+}*/
 
 bool CombatDeck::moveCardToDiscard(std::shared_ptr<Card> card)
 {
@@ -375,7 +371,7 @@ bool CombatDeck::moveCardToDiscard(std::shared_ptr<Card> card)
     }
 
     discardPile_.push(card);
-    notifyCardChanged(CardEvent::DISCARDED, card);
+    //notifyCardChanged(CardEvent::DISCARDED, card);
     return true;
 }
 

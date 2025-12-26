@@ -14,6 +14,7 @@
 #include "Register.h"
 #include "Card.h"
 #include "Buff.h"
+#include "Enum.h"
 
 using namespace std;
 
@@ -117,17 +118,13 @@ private:
         string monsterName;
         
         if (isBoss) {
-            monster = MonsterRegistry::createMonster("Exam");
-            monsterName = "期末考试";
+            monster = RandomGenerator::getInstance()->getRandomMonster(BOSS);
+            monsterName = monster ? monster->getName() : "期末考试";
         } else if (isElite) {
-            vector<string> eliteMonsters = {"DDL", "PhysicalTest"};
-            int idx = RandomGenerator::getInstance()->getRandomNumber(0, eliteMonsters.size() - 1);
-            monster = MonsterRegistry::createMonster(eliteMonsters[idx]);
+            monster = RandomGenerator::getInstance()->getRandomMonster(ELITE);
             monsterName = monster ? monster->getName() : "精英怪物";
         } else {
-            vector<string> normalMonsters = {"Zaoba", "MathHomework"};
-            int idx = RandomGenerator::getInstance()->getRandomNumber(0, normalMonsters.size() - 1);
-            monster = MonsterRegistry::createMonster(normalMonsters[idx]);
+            monster = RandomGenerator::getInstance()->getRandomMonster(NORMAL);
             monsterName = monster ? monster->getName() : "普通怪物";
         }
         
@@ -198,7 +195,7 @@ private:
             monster->endTurn();
             
             cout << "怪物行动完毕。\n";
-            cout << "你受到了伤害，当前生命: " << eventSystem->health_ << "/" << eventSystem->fullHealth_ << "\n";
+            cout << "当前生命: " << eventSystem->health_ << "/" << eventSystem->fullHealth_ << "\n";
             
             if (eventSystem->health_ <= 0) {
                 return false;
@@ -407,8 +404,8 @@ private:
         cout << "========================================\n";
         cout << "当前生命: " << eventSystem->health_ << "/" << eventSystem->fullHealth_ << "\n\n";
         cout << "1. 休息 (恢复30%最大生命值)\n";
-        cout << "2. 冥想 (升级一张牌) [暂未实现]\n";
-        cout << "3. 离开\n";
+        //cout << "2. 冥想 (升级一张牌) [暂未实现]\n";
+        cout << "2. 离开\n";
         cout << "\n请选择: ";
         
         int choice;
@@ -424,9 +421,6 @@ private:
                 break;
             }
             case 2:
-                cout << "\n功能暂未实现。\n";
-                break;
-            case 3:
                 cout << "\n你决定不休息，继续前进。\n";
                 break;
             default:
@@ -500,7 +494,6 @@ public:
             cout << "\n请选择路径 (输入编号): ";
             int nodeChoice;
             cin >> nodeChoice;
-            nodeChoice;
             
             if (cin.fail()) {
                 cin.clear();
@@ -516,7 +509,7 @@ public:
             }
             
             // 选择并处理节点
-            mapSystem->selectNode(--nodeChoice);
+            mapSystem->selectNode(nodeChoice - 1);
             MapNode* selectedNode = mapSystem->getSelectedNode();
             
             processNode(selectedNode);

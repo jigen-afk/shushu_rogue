@@ -31,7 +31,7 @@ void CombatSystem::init(shared_ptr<Player> player, shared_ptr<Monster> monster) 
     player_ = player;
     monster_ = monster;
     
-    cout << "[CombatSystem] 初始化战斗..." << endl;
+    //cout << "[CombatSystem] 初始化战斗..." << endl;
     
     // 初始化玩家
     if (player_) {
@@ -86,7 +86,7 @@ void CombatSystem::drawCards(int count) {
         }
     }
     
-    cout << "[CombatSystem] 抽了 " << drawn << " 张牌" << endl;
+    //cout << "[CombatSystem] 抽了 " << drawn << " 张牌" << endl;
 }
 
 void CombatSystem::discardHand() {
@@ -101,7 +101,7 @@ void CombatSystem::discardHand() {
     }
     combatDeck_->clearHand();
     
-    cout << "[CombatSystem] 弃置所有手牌" << endl;
+    //cout << "[CombatSystem] 弃置所有手牌" << endl;
 }
 
 void CombatSystem::addToHand(shared_ptr<Card> card) {
@@ -141,12 +141,12 @@ void CombatSystem::addToDiscardPile(shared_ptr<Card> card) {
 }
 
 void CombatSystem::addToExhaustPile(shared_ptr<Card> card) {
-    cout << "[CombatSystem] 卡牌【" << card->getName() << "】被消耗" << endl;
+    //cout << "[CombatSystem] 卡牌【" << card->getName() << "】被消耗" << endl;
 }
 
 void CombatSystem::addToDeck(shared_ptr<Card> card) {
     deck.push_back(card);
-    cout << "[CombatSystem] 添加【" << card->getName() << "】到主牌组" << endl;
+    //cout << "[CombatSystem] 添加【" << card->getName() << "】到主牌组" << endl;
 }
 
 bool CombatSystem::exhaustCard(shared_ptr<Card> card) {

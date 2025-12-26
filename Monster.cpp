@@ -46,7 +46,7 @@ public:
 };
 AUTO_REGISTER_MONSTER(Zaoba)
 
-// 高数作业 - 第二关怪物
+// 高数作业 
 class MathHomework : public Monster
 {
 public:
@@ -77,7 +77,7 @@ public:
 };
 AUTO_REGISTER_MONSTER(MathHomework)
 
-// 体测 - 第三关怪物
+// 体测 
 class PhysicalTest : public Monster
 {
 public:
@@ -105,7 +105,7 @@ public:
 };
 AUTO_REGISTER_MONSTER(PhysicalTest)
 
-// DDL - 第四关怪物
+// DDL 
 class DDL : public Monster
 {
 public:

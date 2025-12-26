@@ -24,17 +24,17 @@ void RandomGenerator::initializeGenerators(string seeds)
 	hash<string> hasher;
 	initialSeed_ = static_cast<unsigned int>(hasher(seeds));
 	rng[0].seed(initialSeed_);
-	rng[1].seed(initialSeed_);
-	rng[2].seed(initialSeed_);
+	rng[1].seed(initialSeed_ + 1000);
+	rng[2].seed(initialSeed_ + 2000);
 }
 
 void RandomGenerator::initializeGenerators()
 {
-	srand(time(nullptr));
-	initialSeed_ = rand() % INT_MAX;
-	rng[0].seed(initialSeed_);
-	rng[1].seed(initialSeed_);
-	rng[2].seed(initialSeed_);
+	std::random_device rd;
+	rng[0].seed(rd());
+	rng[1].seed(rd());
+	rng[2].seed(rd());
+	initialSeed_ = 0;
 }
 
 //返回设定的种子
@@ -137,13 +137,13 @@ shared_ptr<Relic> RandomGenerator::getRandomRelic(int rarity)
 }
 
 
-template<typename Elemtype>
-void RandomGenerator::shuffleVector(std::vector<Elemtype>& vec)
+template<typename T>
+void RandomGenerator::shuffleVector(std::vector<T>& vec)
 {
 	for (int i = vec.size()- 1; i > 0; i--)
 	{
-		uniform_int_distribution<> dist(0, i);
-		int j = dist(rng[1]);
+		uniform_int_distribution<> dist(0, i); // 生成一个范围在0到i之间的随机索引
+		int j = dist(rng[1]);  
 		swap(vec[i], vec[j]);
 	}
 }

@@ -159,13 +159,13 @@ public:
     /// @brief 卡牌变化事件回调
     using CardChangedCallback = std::function<void(const std::string& event, std::shared_ptr<Card> card)>;
 
-    /// @brief 设置卡牌变化回调
+ /*   /// @brief 设置卡牌变化回调
     /// @param callback 回调函数
     void setCardChangedCallback(CardChangedCallback callback)
     {
         cardChangedCallback_ = callback;
     }
-
+*/
 protected:
     /// @brief 通知卡牌变化
     /// @param event 事件类型
@@ -182,7 +182,7 @@ private:
     std::shared_ptr<RandomGenerator> randomGen_; /// 随机数生成器
 
     // 事件回调
-    CardChangedCallback cardChangedCallback_;
+    //CardChangedCallback cardChangedCallback_;
 
     // 内部辅助方法
     bool moveCardToDiscard(std::shared_ptr<Card> card);
